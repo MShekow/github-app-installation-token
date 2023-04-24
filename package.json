@@ -1,0 +1,17 @@
+{
+  "name": "github-app-installation-token",
+  "version": "1.0.0",
+  "description": "Dockerized CLI tool that retrieves a GitHub App installation token, given the App's ID and private key",
+  "main": "bin/index.js",
+  "bin": {
+    "github-app-installation-token": "./bin/index.js"
+  },
+  "repository": "https://github.com/MShekow/github-app-installation-token",
+  "author": "Marius Shekow",
+  "license": "MIT",
+  "dependencies": {
+    "octokit": "2.0.14",
+    "yargs": "17.7.1"
+  },
+  "type": "module"
+}

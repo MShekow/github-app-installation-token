@@ -1,0 +1,42 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.202.3/containers/typescript-node
+{
+	"name": "Node.js & TypeScript",
+	"build": {
+		"dockerfile": "../Dockerfile",
+		"context": "..",
+		"target": "vscode-development"
+	},
+	
+	"customizations": {
+		// Configure properties specific to VS Code.
+		"vscode": {
+			// Set *default* container specific settings.json values on container create.
+			"settings": {},
+			// Add the IDs of extensions you want installed when the container is created.
+			"extensions": [
+				"dbaeumer.vscode-eslint"
+			]
+		}
+	},
+
+	// See https://code.visualstudio.com/remote/advancedcontainers/improve-performance#_use-a-targeted-named-volume
+	// We do this for performance reasons on Windows and macOS hosts!
+	// Without this, the automatic bind mount (of the workspace) that VS automatically(!) creates (which is not shown
+	// in this file) would also affect the "nodes_modules" folder, and copy it to the host, which would make working
+	// with NPM projects at least 3 times slower! The line below creates a Docker volume and mounts it
+	"mounts": [
+		"source=gha-inst-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
+	],
+
+	// VS Code will automatically detect once the Angular dev server has started and forward its port to the host.
+	// Thus we don't need to explicitly specify any ports here.
+	// "forwardPorts": [],
+
+	// Moves the node_modules which were already installed at BUILD-time to the mounted docker volume (clearing it first, to avoid stale packages)
+	"postCreateCommand": "sudo chown node:node ${containerWorkspaceFolder}/node_modules && sudo rm -rf ${containerWorkspaceFolder}/node_modules/* && cp --preserve=mode,timestamps -a /app/node_modules/. ${containerWorkspaceFolder}/node_modules/",
+
+	// Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
+	// "remoteUser": "node"
+}
+
