@@ -20,7 +20,7 @@ jobs:
   build-test-push:
     runs-on: ubuntu-latest
     env:
-      APP_ID: 322780
+      APP_ID: 3227800
       APP_INSTALLATION_ID: 36777409
     permissions:
       contents: read
