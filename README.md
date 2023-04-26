@@ -2,7 +2,7 @@
 
 This is a dockerized CLI tool that retrieves a GitHub App installation token, given the App's ID and private key.
 
-It was developed to be used in CI/CD platforms _other than_ **GitHub Actions**, e.g. **Azure DevOps** or **Circle CI**, that need to interact with GitHub.com (or some GitHub Enterprise server) where you code is stored.
+It was developed to be used in CI/CD platforms _other than_ **GitHub Actions**, e.g. **Azure DevOps** or **Circle CI**, that need to interact with GitHub.com (or some GitHub Enterprise server) where your code is stored.
 
 ## Usage
 
