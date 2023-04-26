@@ -1,6 +1,6 @@
 # github-app-installation-token
 
-This is a dockerized CLI tool that retrieves a GitHub App installation token, given the App's ID and private key.
+This is a dockerized CLI tool that retrieves a [GitHub App installation access token](https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/generating-an-installation-access-token-for-a-github-app), given the App's ID and private key.
 
 It was developed to be used in CI/CD platforms _other than_ **GitHub Actions**, e.g. **Azure DevOps** or **Circle CI**, that need to interact with GitHub.com (or some GitHub Enterprise server) where your code is stored.
 
@@ -14,7 +14,6 @@ Run `docker run --rm ghcr.io/mshekow/github-app-installation-token:latest` to ge
 
 ## Alternatives
 
-For **GitHub Actions** you can use https://github.com/jnwng/github-app-installation-token-action or https://github.com/tibdex/github-app-token.
+If you use **GitHub Actions** you can use https://github.com/jnwng/github-app-installation-token-action or https://github.com/tibdex/github-app-token.
 
-If you are looking for a Docker-based alternative, define a (Docker) _container-based_ job in your CI/CD pipeline, that starts a Node.js-based image. Use https://github.com/gagoar/github-app-installation-token. At the time of writing this README, however, that repository seemed to lack maintenance.
-
+If you are looking for a _Docker-based_ alternative, define a (Docker) _container-based_ job in your CI/CD pipeline, that starts a Node.js-based image. Use https://github.com/gagoar/github-app-installation-token to install a Node-based CLI tool that can retrieve App installation access tokens. At the time of writing this README, however, that repository seemed to lack maintenance, which is why I created this tool.
