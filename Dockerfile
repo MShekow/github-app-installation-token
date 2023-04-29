@@ -7,7 +7,7 @@ COPY . .
 
 
 FROM build as vscode-development
-RUN apt-get update && apt-get install -y git sudo
+RUN apk add -u git sudo
 # The node base image already has a user and group called "node" which we can use
 ARG USERNAME=node
 # Add sudo support
