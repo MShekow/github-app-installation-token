@@ -58,7 +58,7 @@ jobs:
       - name: Compute Docker tags to push to
         id: meta
         if: github.ref == 'refs/heads/main'
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
