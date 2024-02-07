@@ -55,6 +55,7 @@ jobs:
             echo "$output"
             exit $exit_code
           fi
+          rm private.key
       - name: Compute Docker tags to push to
         id: meta
         if: github.ref == 'refs/heads/main'
