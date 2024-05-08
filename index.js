@@ -1,4 +1,4 @@
-import { Octokit } from "octokit";
+import { Octokit } from "@octokit/core";
 import {createAppAuth} from "@octokit/auth-app"
 import {readFileSync} from "fs"
 import yargs from 'yargs'
