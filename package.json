@@ -7,7 +7,7 @@
   "author": "Marius Shekow",
   "license": "MIT",
   "dependencies": {
-    "octokit": "4.1.4",
+    "octokit": "5.0.2",
     "yargs": "17.7.2"
   },
   "type": "module"
