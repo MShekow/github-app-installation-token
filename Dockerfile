@@ -16,5 +16,6 @@ RUN echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
 USER $USERNAME
 
 FROM build as app
+USER node
 ENTRYPOINT ["node", "index.js"]
 CMD ["--help"]
