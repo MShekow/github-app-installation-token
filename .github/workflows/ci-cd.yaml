@@ -9,12 +9,18 @@ on:
     paths-ignore:
       - 'README.md'
       - 'renovate.json'
+      # The changelog step below commits CHANGELOG.md back to main; ignore it
+      # (together with "[skip ci]") so that commit does not re-trigger this job.
+      - 'CHANGELOG.md'
   pull_request:
     branches:
       - main
     paths-ignore:
       - 'README.md'
       - 'renovate.json'
+      # The changelog step below commits CHANGELOG.md back to main; ignore it
+      # (together with "[skip ci]") so that commit does not re-trigger this job.
+      - 'CHANGELOG.md'
 
 jobs:
   build-test-push:
@@ -23,11 +29,13 @@ jobs:
       APP_ID: 322780
       APP_INSTALLATION_ID: 36777409
     permissions:
-      contents: read
+      contents: write  # push the changelog commit + release tag, and create the GitHub release
       packages: write
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          fetch-depth: 0  # git-cliff needs full history to build the changelog
       - name: Log in to the GitHub container registry
         uses: docker/login-action@v4
         with:
@@ -56,6 +64,63 @@ jobs:
             exit $exit_code
           fi
           rm private.key
+      # Generate the changelog, create the release tag, and publish a GitHub
+      # release BEFORE the image is built/pushed, so the release notes for the
+      # new version are already resolvable by downstream tools (e.g. Renovate)
+      # the moment the matching image tag appears.
+      - name: Generate changelog and release
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIT_CLIFF: orhun/git-cliff:2.12.0
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+
+          # The merge range = commits introduced by this push. Computing the new
+          # section from a commit range (not from tags) means this works on the
+          # very first run with no pre-existing tags, and never rewrites history
+          # already captured in the committed CHANGELOG.md.
+          before="$BEFORE_SHA"
+          if ! git rev-parse -q --verify "${before}^{commit}" >/dev/null 2>&1; then
+            before="$(git rev-parse HEAD~1)"  # fallback (e.g. all-zero before SHA)
+          fi
+          range="${before}..${AFTER_SHA}"
+
+          # CalVer tag matching the image's {{date 'YYYY.MM.DD'}}, with a .N
+          # suffix if there is already a release for today (keeps each section
+          # and tag unique on busy days).
+          base="$(date -u +%Y.%m.%d)"; tag="$base"; n=1
+          while git rev-parse -q --verify "refs/tags/$tag" >/dev/null 2>&1; do
+            n=$((n + 1)); tag="$base.$n"
+          done
+
+          run_cliff() { docker run --rm --user "$(id -u):$(id -g)" -v "$PWD:/w" -w /w "$GIT_CLIFF" "$@"; }
+
+          # Prepend this release's section to CHANGELOG.md.
+          run_cliff --tag "$tag" --prepend CHANGELOG.md "$range"
+
+          # Nothing changelog-worthy (only non-conventional commits)? Still let the
+          # image publish, but skip the tag/commit/release for an empty section.
+          if git diff --quiet -- CHANGELOG.md; then
+            echo "No changelog-worthy commits in $range; skipping release $tag."
+            exit 0
+          fi
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          git commit -m "docs(changelog): release $tag [skip ci]"
+          git tag "$tag"
+          git push origin "HEAD:$BRANCH"
+          git push origin "$tag"
+
+          # Publish a GitHub release carrying just this version's notes.
+          run_cliff --tag "$tag" --strip header "$range" > "$RUNNER_TEMP/notes.md"
+          gh release create "$tag" --title "$tag" --notes-file "$RUNNER_TEMP/notes.md"
+
       - name: Compute Docker tags to push to
         id: meta
         if: github.ref == 'refs/heads/main'

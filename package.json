@@ -6,6 +6,9 @@
   "repository": "https://github.com/MShekow/github-app-installation-token",
   "author": "Marius Shekow",
   "license": "MIT",
+  "scripts": {
+    "changelog": "git-cliff -o CHANGELOG.md"
+  },
   "dependencies": {
     "octokit": "5.0.5",
     "yargs": "18.0.0"

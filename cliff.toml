@@ -1,0 +1,66 @@
+# git-cliff ~ configuration file
+# https://git-cliff.org/docs/configuration
+#
+# This project uses CalVer (YYYY.MM.DD) to match the Docker image tags produced
+# by .github/workflows/ci-cd.yaml. There is no SemVer; a "release" is the state
+# of `main` on a given day, published as ghcr.io/.../...:YYYY.MM.DD + :latest.
+# To cut a changelog entry for a release, tag the shipped commit with that same
+# date, e.g.  git tag 2026.06.28  (see the "Release process" section in README).
+
+[changelog]
+header = """
+# Changelog
+
+All notable changes to this project are documented here.
+
+This project uses [CalVer](https://calver.org/) (`YYYY.MM.DD`) to match the
+published Docker image tags. The changelog is generated with
+[git-cliff](https://git-cliff.org) from [Conventional Commits](https://www.conventionalcommits.org).\n
+"""
+# https://keats.github.io/tera/docs/#introduction
+body = """
+{% if commits | length == 0 %}{% else %}\
+{% set base_url = "https://github.com/" ~ remote.github.owner ~ "/" ~ remote.github.repo %}\
+{% if version %}\
+    ## [{{ version | trim_start_matches(pat="v") }}]{% if previous and previous.version %}({{ base_url }}/compare/{{ previous.version }}...{{ version }}){% endif %} - {{ timestamp | date(format="%Y-%m-%d") }}
+{% else %}\
+    ## [Unreleased]
+{% endif %}\
+{% for group, commits in commits | group_by(attribute="group") %}
+    ### {{ group | striptags | trim | upper_first }}
+    {% for commit in commits %}
+        - {{ commit.message | split(pat="\n") | first | upper_first | trim }}\
+    {% endfor %}
+{% endfor %}
+{% endif %}\
+"""
+footer = ""
+trim = true
+
+[git]
+conventional_commits = true
+# Keep non-conventional commits (the early hand-written ones) out of the log
+filter_unconventional = true
+split_commits = false
+commit_parsers = [
+    { message = "^feat", group = "<!-- 0 -->🚀 Features" },
+    { message = "^fix\\(deps\\)", group = "<!-- 2 -->📦 Dependencies" },
+    { message = "^chore\\(deps\\)", group = "<!-- 2 -->📦 Dependencies" },
+    { message = "^fix", group = "<!-- 1 -->🐛 Bug Fixes" },
+    { message = "^doc", group = "<!-- 3 -->📚 Documentation" },
+    { message = "^perf", group = "<!-- 4 -->⚡ Performance" },
+    { message = "^refactor", group = "<!-- 5 -->🚜 Refactor" },
+    { message = "^ci", group = "<!-- 6 -->⚙️ CI/CD" },
+    { message = "^chore", group = "<!-- 7 -->🧹 Miscellaneous" },
+    { message = "^Merge", skip = true },
+]
+protect_breaking_commits = false
+filter_commits = false
+# CalVer tags: YYYY.MM.DD (optionally a .N suffix for multiple same-day releases)
+tag_pattern = "[0-9]{4}\\.[0-9]{2}\\.[0-9]{2}.*"
+topo_order = false
+sort_commits = "newest"
+
+[remote.github]
+owner = "MShekow"
+repo = "github-app-installation-token"

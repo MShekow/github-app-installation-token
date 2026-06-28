@@ -20,6 +20,12 @@ Run `docker run --rm ghcr.io/mshekow/github-app-installation-token:latest` to ge
 
 The `ghcr.io/mshekow/github-app-installation-token` Docker image is built for Intel/AMD 64-bit and ARM 64-bit architectures. Just open a Pull Request if you need additional CPU architectures. It is automatically rebuilt whenever there are dependency updates
 
+## Changelog
+
+See [`CHANGELOG.md`](./CHANGELOG.md). Releases use [CalVer](https://calver.org/) (`YYYY.MM.DD`), matching the published Docker image tags.
+
+The changelog is generated from [Conventional Commits](https://www.conventionalcommits.org) with [git-cliff](https://git-cliff.org). On every merge to `main`, CI generates the new entry, creates the matching `YYYY.MM.DD` git tag and GitHub release, and commits the updated `CHANGELOG.md` _before_ the image is published — so the release notes for a given version are available as soon as its image tag appears. To preview the changelog locally, run `yarn changelog` (requires the [git-cliff CLI](https://git-cliff.org/docs/installation/)).
+
 ## Alternatives
 
 If you use **GitHub Actions** you can use https://github.com/jnwng/github-app-installation-token-action or https://github.com/tibdex/github-app-token.
