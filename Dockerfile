@@ -1,6 +1,7 @@
 FROM node:26.12.1-alpine AS build
 
 WORKDIR /app
+RUN npm install -g corepack && corepack enable
 COPY package.json yarn.lock ./
 RUN --mount=type=cache,target=/root/.yarn,id=yarn-cache YARN_CACHE_FOLDER=/root/.yarn yarn install --frozen-lockfile
 COPY . .
